@@ -1,13 +1,14 @@
-"""
-Основная точка входа сервиса ИИ-протоколирования.
-"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from backend.app.api.routes import router as sessions_router
 
 app = FastAPI(
     title="ИИ-система протоколирования совещаний Министерства образования",
     description="Автономный сервис генерации проектов протоколов в защищённом контуре",
-    version="0.1.0",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/api/openapi.json"
 )
 
 app.add_middleware(
@@ -18,8 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(sessions_router)
 
-@app.get("/api/health")
+
+@app.get("/api/health", tags=["Служебные"])
 async def health_check():
     return {
         "status": "healthy",
