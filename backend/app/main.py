@@ -1,5 +1,8 @@
+from typing import Any
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from backend.app.api.routes import router as sessions_router
 
 app = FastAPI(
@@ -8,7 +11,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/api/openapi.json"
+    openapi_url="/api/openapi.json",
 )
 
 app.add_middleware(
@@ -23,7 +26,7 @@ app.include_router(sessions_router)
 
 
 @app.get("/api/health", tags=["Служебные"])
-async def health_check():
+async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy",
         "service": "kernel-panic-meeting-protocol",
@@ -34,4 +37,5 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("backend.app.main:app", host="127.0.0.1", port=8000, reload=True)

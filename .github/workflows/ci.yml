@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies via uv
         run: |
-          uv pip install -e ".[dev]"
+          uv sync --extra dev
 
       - name: Run Ruff Linting & Formatting Check
         run: |
