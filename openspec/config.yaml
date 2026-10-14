@@ -3,6 +3,7 @@ context: |
   Проект: "Агент: ИИ система для протоколирования совещаний Министерства образования Свердловской области"
   Целевая платформа: Автономная рабочая станция в защищённом локальном контуре (без передачи во внешние облака)
   Основной стек:
+    - Package manager: uv (Astral)
     - Backend: Python 3.11+, FastAPI, Pydantic v2, python-docx / docxtpl
     - ML / NLP: Российская LLM (GigaChat On-Prem / локальный инференс Saiga/Vikhr/T-lite через vLLM/llama.cpp), Faster-Whisper / GigaAM для распознавания русской речи (STT)
     - Frontend: React / Vite + Tailwind CSS / Shadcn UI (веб-интерфейс визуального редактирования)

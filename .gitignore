@@ -24,6 +24,8 @@ wheels/
 .venv
 venv/
 ENV/
+.uv/
+.uv_cache/
 
 # Data & Audio
 data/

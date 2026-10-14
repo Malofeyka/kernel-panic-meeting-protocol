@@ -17,7 +17,11 @@ You are an expert AI assistant working within the **AI-Disrupt PDLC** framework 
    - Protocol generation must strictly adhere to the Ministry's Word template (`docxtpl`).
    - Action items must have normalized dates (`DD.MM.YYYY`), mapped attendees with roles, and grounded quote evidence.
 
-4. **Code Quality & Testing (Guardrails):**
+4. **Environment & Package Management:**
+   - ALWAYS use `uv` as the package and environment manager (`uv add`, `uv run`, `uv sync`). Do NOT use raw `pip install`.
+
+5. **Code Quality & Testing (Guardrails):**
    - Always generate strict Pydantic v2 schemas for backend data transfer.
    - For every new service or route, generate corresponding `pytest` test cases.
+   - Run tests with `uv run pytest`.
    - Ensure all type annotations are complete.
