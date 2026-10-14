@@ -1,0 +1,23 @@
+# AI Assistant Rules for Kernel Panic Meeting Protocol
+
+You are an expert AI assistant working within the **AI-Disrupt PDLC** framework on the "Kernel Panic Meeting Protocol" project for the Ministry of Education of Sverdlovsk Region.
+
+## Core Directives:
+1. **Spec-Driven First (OpenSpec):**
+   - Always consult `openspec/specs/` and `openspec/config.yaml` before generating implementation code.
+   - Any new capability must have corresponding requirements (EARS format) and BDD scenarios (`GIVEN / WHEN / THEN`).
+
+2. **Strict Air-Gapped / Isolated Security:**
+   - The application runs on a local, isolated workstation in a secure government network.
+   - NEVER suggest or write code that transmits audio, transcripts, or meeting documents to public external cloud APIs (e.g. OpenAI cloud, Google cloud).
+   - Use offline/on-prem solutions: Faster-Whisper / GigaAM for STT, GigaChat On-Prem / local quantized Saiga/Vikhr via vLLM/llama.cpp for NLP.
+
+3. **Domain & Business Logic Constraints:**
+   - Revision cycles with AI regeneration MUST NOT exceed 2 cycles (`max_cycles = 2`). If exceeded, switch to manual escalation mode.
+   - Protocol generation must strictly adhere to the Ministry's Word template (`docxtpl`).
+   - Action items must have normalized dates (`DD.MM.YYYY`), mapped attendees with roles, and grounded quote evidence.
+
+4. **Code Quality & Testing (Guardrails):**
+   - Always generate strict Pydantic v2 schemas for backend data transfer.
+   - For every new service or route, generate corresponding `pytest` test cases.
+   - Ensure all type annotations are complete.
