@@ -112,3 +112,54 @@ cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+## 🌿 Регламент работы с Git и ветками
+
+В проекте действует строгое правило: **каждая новая задача из `tasks.md` разрабатывается в отдельной ветке**.  
+Прямой коммит в ветку `main` запрещён. Слияние выполняется через Pull Request (PR) после успешного прохождения автоматических тестов (`uv run pytest`) и ревью.
+
+### Шаблон именования веток:
+```text
+<тип>/<ID_ТАСКИ>[-краткое-описание]
+```
+
+#### Примеры:
+- `feature/ML-101` или `feature/ML-101-offline-stt` — новая функциональность (STT, извлечение, генератор DOCX, UI-компоненты);
+- `feature/BE-201-extract-action-items` — реализация пайплайна поручений;
+- `feature/FE-201-review-editor` — визуальный редактор протокола;
+- `fix/BE-102-docx-table-borders` — исправление бага в коде таски;
+- `refactor/ML-301-stt-chunking` — оптимизация производительности или рефакторинг;
+- `docs/QA-202-user-guide` — подготовка или обновление документации/инструкций.
+
+### Формат сообщений коммитов (Conventional Commits):
+```text
+<тип>(<код-таски>): <краткое описание на русском или английском>
+```
+*Примеры:*
+- `feat(ML-101): implement faster-whisper chunked audio pipeline`
+- `feat(BE-201): add action items and due dates extraction`
+- `fix(BE-102): fix margins in official ministry docx template`
+
+---
+
+## 🛡️ Контроль качества (Quality Gates, CI & PR)
+
+Перед слиянием любого кода в `main` в GitHub Actions CI автоматически запускается пайплайн проверки (`.github/workflows/ci.yml`):
+
+1. **Линтинг и форматирование:**
+   ```bash
+   uv run ruff check .
+   uv run ruff format --check .
+   ```
+2. **Статическая типизация:**
+   ```bash
+   uv run mypy backend
+   ```
+3. **Покрытие тестами (Coverage Gate $\ge 80\%$):**
+   ```bash
+   uv run pytest --cov=backend --cov-fail-under=80
+   ```
+4. **Шаблон Pull Request:**
+   При открытии PR автоматически применяется шаблон [`.github/pull_request_template.md`](.github/pull_request_template.md) с обязательным чек-листом соответствия OpenSpec, прохождения тестов и требований информационной безопасности.

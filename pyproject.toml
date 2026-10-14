@@ -20,6 +20,7 @@ dependencies = [
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
     "ruff>=0.3.0",
     "mypy>=1.9.0",
 ]
@@ -36,3 +37,14 @@ target-version = "py311"
 python_version = "3.11"
 strict = true
 ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["backend"]
+omit = [
+    "tests/*",
+    "backend/app/main.py",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true

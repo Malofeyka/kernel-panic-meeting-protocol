@@ -57,9 +57,10 @@
 
 Каждая задача из `openspec/changes/001-initial-protocol-agent/tasks.md` выполняется строго по 5 шагам:
 
-1. **Step 1: Specification (Intention):**
-   Разработчик не пишет код «из головы». Сначала формулируется спецификация в `openspec/specs/` (входные данные, сценарии BDD `GIVEN / WHEN / THEN`).
-2. **Step 2: Context Injection:**
+1. **Step 1: Specification & Branching (Замысел и изоляция):**
+   - Разработчик создаёт изолированную ветку строго под задачу: `git checkout -b feature/<TASK_ID>` (например, `git checkout -b feature/ML-101`).
+   - Перед кодингом фиксируются требования в `openspec/specs/` (входные данные, структуры, BDD-сценарии `GIVEN / WHEN / THEN`).
+2. **Step 2: Context Injection (Передача контекста):**
    Разработчик передает ИИ-ассистенту:
    - Контекст проекта из `openspec/config.yaml`;
    - API-контракт `backend/app/schemas/api_contract.py`;
@@ -67,9 +68,13 @@
 3. **Step 3: AI Generation (First Pass):**
    ИИ генерирует черновой код модуля и **сразу набор тестов к нему**.
 4. **Step 4: Deterministic Guardrails (Проверка рельсами):**
-   Запуск локального тестирования (`uv run pytest`, `uv run ruff check`, проверка типов `uv run mypy`). ИИ исправляет ошибки компиляции/типизации до тех пор, пока тесты не станут «зелёными».
-5. **Step 5: Human Semantic Review:**
-   Инженер проверяет соответствие кода замыслу, отсутствие галлюцинаций в логике и производительность.
+   Запуск локального тестирования и линтеров:
+   - `uv run ruff check .` и `uv run ruff format --check .` (стиль и качество кода);
+   - `uv run mypy backend` (статическая типизация);
+   - `uv run pytest --cov=backend --cov-fail-under=80` (все тесты «зелёные», покрытие кодом не ниже **80%**).
+   ИИ исправляет ошибки компиляции/типизации/тестов до тех пор, пока все проверки не станут «зелёными».
+5. **Step 5: Pull Request & Semantic Human Review:**
+   Инженер создаёт PR по утверждённому шаблону [`.github/pull_request_template.md`](.github/pull_request_template.md). CI-пайплайн GitHub Actions автоматически проверяет линтеры и тесты. Ревьюер проверяет логику и соответствие OpenSpec.
 
 ---
 

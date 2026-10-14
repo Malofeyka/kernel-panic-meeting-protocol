@@ -20,8 +20,14 @@ You are an expert AI assistant working within the **AI-Disrupt PDLC** framework 
 4. **Environment & Package Management:**
    - ALWAYS use `uv` as the package and environment manager (`uv add`, `uv run`, `uv sync`). Do NOT use raw `pip install`.
 
-5. **Code Quality & Testing (Guardrails):**
+5. **Git Branching & Commit Conventions:**
+   - Always name branches following the pattern: `<type>/<TASK_ID>[-short-description]` (e.g., `feature/ML-101`, `feature/BE-201-action-items`, `fix/FE-201-editor-state`).
+   - Format commit messages as: `<type>(<task_id>): <description>` (e.g., `feat(ML-101): add audio chunking pipeline`).
+
+6. **Code Quality & Testing (Guardrails):**
    - Always generate strict Pydantic v2 schemas for backend data transfer.
    - For every new service or route, generate corresponding `pytest` test cases.
+   - Minimum test coverage requirement is **80%** (`uv run pytest --cov=backend --cov-fail-under=80`).
    - Run tests with `uv run pytest`.
-   - Ensure all type annotations are complete.
+   - Format and lint code with `uv run ruff check .` and `uv run ruff format .`.
+   - Ensure all type annotations are complete (`uv run mypy backend`).
