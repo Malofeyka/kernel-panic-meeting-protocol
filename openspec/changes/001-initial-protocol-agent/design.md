@@ -19,7 +19,7 @@ flowchart TD
     end
 
     subgraph AI_Engine ["ИИ-контур (Автономный локальный стек)"]
-        STT["STT Модуль: Faster-Whisper / GigaAM (Русский язык, адаптация)"]
+        STT["STT Модуль: GigaAM (Русский язык, адаптация)"]
         LLM_Engine["Пайплайн извлечения: Российская LLM (GigaChat On-Prem / Saiga / Vikhr)"]
         EntityResolver["Нормализатор сущностей (NER, даты, ФИО, сопоставление со списком)"]
         CrossChecker["Аналитический модуль: коллизии с архивом и пробелы"]
@@ -72,7 +72,7 @@ flowchart TD
 ## 3. Technology Stack & Component Details
 
 ### 3.1. Speech-to-Text (STT)
-- **Технология:** `faster-whisper` (large-v3-turbo / medium) с поддержкой квантизации `int8_float16` на GPU/CPU или `GigaAM-v2` (SberDevices).
+- **Технология:** `GigaAM-v2` (SberDevices) с локальным запуском на CPU/GPU.
 - **Особенности:**
   - Нарезка длинного аудио (chunking с overlap) для стабильной обработки 1.5 часов без утечек памяти;
   - Словарь подсказок (prompt hotwords): включение списка участников совещания, аббревиатур (ЕГЭ, ОГЭ, РИП, ФОП, ИРО) и ключевых терминов повестки для повышения точности распознавания узкоспециальных слов.

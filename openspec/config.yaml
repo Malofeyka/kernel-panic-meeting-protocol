@@ -5,7 +5,7 @@ context: |
   Основной стек:
     - Package manager: uv (Astral)
     - Backend: Python 3.11+, FastAPI, Pydantic v2, python-docx / docxtpl
-    - ML / NLP: Российская LLM (GigaChat On-Prem / локальный инференс Saiga/Vikhr/T-lite через vLLM/llama.cpp), Faster-Whisper / GigaAM для распознавания русской речи (STT)
+    - ML / NLP: Российская LLM (GigaChat On-Prem / локальный инференс Saiga/Vikhr/T-lite через vLLM/llama.cpp), GigaAM для распознавания русской речи (STT)
     - Frontend: React / Vite + Tailwind CSS / Shadcn UI (веб-интерфейс визуального редактирования)
     - Хранилище: Локальное SQLite / JSON storage для сессий протоколирования, файловая система для аудио и документов
 rules:

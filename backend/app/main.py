@@ -3,7 +3,9 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.app.api.gigachat import router as gigachat_router
 from backend.app.api.routes import router as sessions_router
+from backend.app.api.transcription import router as transcription_router
 
 app = FastAPI(
     title="ИИ-система протоколирования совещаний Министерства образования",
@@ -23,6 +25,8 @@ app.add_middleware(
 )
 
 app.include_router(sessions_router)
+app.include_router(transcription_router)
+app.include_router(gigachat_router)
 
 
 @app.get("/api/health", tags=["Служебные"])

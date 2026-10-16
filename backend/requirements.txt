@@ -4,7 +4,18 @@ pydantic>=2.6.0
 python-multipart>=0.0.9
 python-docx>=1.1.0
 docxtpl>=0.16.8
-faster-whisper>=1.0.0
 pytest>=8.0.0
 httpx>=0.27.0
 python-dotenv>=1.0.1
+huggingface-hub>=0.30.0
+# --- STT / ML (сервис транскрибации GigaAM) ---
+# torch/torchaudio ставятся из CUDA-индекса PyTorch (cu128):
+#   pip install --extra-index-url https://download.pytorch.org/whl/cu128 torch==2.9.0 torchaudio==2.9.0
+torch==2.9.0
+torchaudio==2.9.0
+torchcodec==0.9.1
+transformers==5.*
+gigaam @ git+https://github.com/salute-developers/GigaAM.git@7447938d791c4f3e643386ee22c33777004293a5
+numba>=0.62
+pyannote.audio==4.0.*
+pyarrow>=23

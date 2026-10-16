@@ -21,6 +21,8 @@ wheels/
 .installed.cfg
 *.egg
 .env
+.env.*
+!.env.example
 .venv
 venv/
 ENV/
@@ -33,6 +35,16 @@ uploads/
 storage/
 models/
 weights/
+tools/llama.cpp/
+tools/downloads/
+hf_cache/
+.cache/
+*.gguf
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.onnx
 *.wav
 *.mp3
 *.m4a
@@ -41,6 +53,17 @@ weights/
 *.mp4
 *.docx
 !templates/*.docx
+*.transcription.json
+*.summary.json
+
+# Local experiment outputs
+benchmarks/results/
+reports/local/
+*.sqlite
+*.db
+*.pid
+*.tmp
+*.bak
 
 # Frontend
 node_modules/
@@ -56,4 +79,5 @@ logs/
 .coverage
 htmlcov/
 .DS_Store
+Thumbs.db
 *.swp
