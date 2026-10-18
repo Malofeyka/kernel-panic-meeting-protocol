@@ -13,7 +13,7 @@
 | Роль | Основная зона ответственности | Ключевые компетенции |
 |---|---|---|
 | **1. Team Lead / System Architect & PM** | Общая системная архитектура, требования ИБ защищенного контура, интеграция модулей, управление сроками и рисками, ведение OpenSpec | Python, System Design, Information Security, Project Management |
-| **2. AI / ML Engineer (Speech & Local LLM)** | Офлайн STT аудиопайплайн (1.5 ч), адаптация словаря Минобразования, квантизация и локальный инференс российской LLM (GigaChat / Saiga / Vikhr) | PyTorch, faster-whisper, GigaAM, vLLM / llama.cpp, Audio DSP |
+| **2. AI / ML Engineer (Speech & Local LLM)** | Офлайн STT аудиопайплайн (1.5 ч), адаптация словаря Минобразования, квантизация и локальный инференс российской LLM (GigaChat / Saiga / Vikhr) | PyTorch, GigaAM, vLLM / llama.cpp, Audio DSP |
 | **3. Backend Engineer (NER, RAG, DOCX)** | Бизнес-логика FastAPI, пайплайны извлечения сущностей, резолюция ФИО и сроков, аналитика рисков/противоречий, генерация .docx | Python, FastAPI, Pydantic, python-docx, docxtpl, LangChain / LlamaIndex |
 | **4. Frontend / Fullstack Developer** | Клиентское веб-приложение, загрузчик файлов, интерактивный редактор протокола, панель аналитики, счётчик циклов правок (до 2) | React, TypeScript, Vite, Tailwind CSS, State Management, REST API |
 | **5. QA Engineer / AI Evaluator & TechWriter** | Оценка метрик качества LLM (полнота, точность, галлюцинации), синтез и разметка тестовых датасетов, сквозное тестирование, инструкция пользователя | Python (pytest, DeepEval / Ragas), Prompt Evaluation, Technical Documentation |
@@ -34,7 +34,7 @@
 
 #### [ML] AI / ML Engineer (Speech & Local LLM)
 - [ ] **ML-101: Развёртывание и бенчмарк автономного STT для длинных аудио (1–1.5 ч)** `P0`
-  - *Описание:* Сравнение и настройка `faster-whisper` и `GigaAM-v2` для распознавания русской речи совещаний с чанкованием.
+  - *Описание:* Настройка и бенчмарк `GigaAM-v2` для распознавания русской речи совещаний с чанкованием.
   - *DoD:* Аудиозапись 90 минут транскрибируется без падений по OOM; точность по WER/CER на русском языке удовлетворяет требованиям; формируются таймкоды.
 - [ ] **ML-102: Настройка доменного словаря и hotwords для распознавания речи** `P1`
   - *Описание:* Механизм передачи контекстных подсказок (список сотрудников, аббревиатуры Минобразования) в STT.

@@ -88,7 +88,7 @@ flowchart TD
 
 ## 🔒 Требования информационной безопасности
 1. **Строгая автономность:** работа в изолированном контуре без передачи аудиозаписей, стенограмм и протоколов во внешние публичные облака.
-2. **Отечественная технологическая база:** использование российских моделей распознавания речи и LLM-инференса (GigaAM / Faster-Whisper, GigaChat On-Prem / Saiga / Vikhr).
+2. **Отечественная технологическая база:** использование российской модели распознавания речи GigaAM и локального LLM-инференса (GigaChat On-Prem / Saiga / Vikhr).
 3. **Размещение:** выделенное рабочее место (ПК) сотрудника Министерства образования Свердловской области.
 
 ---
@@ -105,6 +105,51 @@ uv pip install -e .
 # Либо запуск напрямую через uv run:
 uv run uvicorn backend.app.main:app --reload --port 8000
 ```
+
+### Локальные GigaAM и GigaChat
+Для Windows нужен FFmpeg 8.1 shared. По умолчанию используется `C:\ffmpeg8\bin`; другой путь можно задать через `FFMPEG_BIN` в `.env`. Для первого скачивания VAD-модели `pyannote/segmentation-3.0` нужен `HF_TOKEN` с принятыми условиями доступа к модели.
+
+GigaChat использует открытую модель `ai-sage/GigaChat3.1-10B-A1.8B-GGUF` (revision `97045b260251cfa86f5ad25638fa2dd074153446`, Q4_K_M, MIT). Вес сохраняется в `models/gigachat/GigaChat3.1-10B-A1.8B-q4_K_M.gguf`:
+
+```bash
+uv sync --extra dev
+uv run python scripts/download_gigachat.py
+```
+
+Для инференса нужен [llama.cpp b11675](https://github.com/ggml-org/llama.cpp/releases/tag/b11675). Архивы `llama-b11675-bin-win-cuda-12.4-x64.zip` и `cudart-llama-bin-win-cuda-12.4-x64.zip` распаковываются в `tools/llama.cpp/`, где должен находиться `llama-server.exe`.
+
+```powershell
+# На 4 ГБ VRAM начинать без GPU offload; для коротких текстов ContextSize можно уменьшить до 4096
+powershell -ExecutionPolicy Bypass -File scripts/start_gigachat.ps1 -ContextSize 40960 -GpuLayers 0
+```
+
+Контекст 40960 нужен для полного `test1.mp4`: его JSON-транскрибация содержит около 35,5 тыс. токенов. Для более длинных записей контекст подбирается отдельно; chunking пока не реализован. Обработка такого prompt на CPU занимает несколько минут, поэтому таймаут Python-клиента по умолчанию составляет 1800 секунд.
+
+В другом терминале запускается связка STT → LLM:
+
+```bash
+uv run python test.py path/to/audio.mp4 --output data/transcription.json --summary-output data/summary.json --batch-size 4
+```
+
+Скрипт сохраняет транскрибацию GigaAM, передаёт её полный JSON (`model`, `source`, `text`, `segments`) в локальный GigaChat и сохраняет краткую суть в отдельный JSON. `GIGACHAT_BASE_URL` по умолчанию равен `http://127.0.0.1:8080`; разрешены только loopback-адреса. После скачивания обе модели работают без обращения к внешним API.
+
+### API-якоря GigaChat для backend
+
+- `GET /api/gigachat/health` — проверка готовности локального llama-server;
+- `POST /api/gigachat/chat` — общий вызов модели:
+
+  ```json
+  {
+    "prompt": "Кратко передай суть текста",
+    "system_prompt": null,
+    "temperature": 0.0,
+    "max_tokens": 512
+  }
+  ```
+
+  Ответ: `{"text": "..."}`.
+
+- `POST /api/gigachat/summary` — принимает JSON транскрибации GigaAM и возвращает `{"summary": "..."}`.
 
 ### Фронтенд
 ```bash
@@ -138,7 +183,7 @@ npm run dev
 <тип>(<код-таски>): <краткое описание на русском или английском>
 ```
 *Примеры:*
-- `feat(ML-101): implement faster-whisper chunked audio pipeline`
+- `feat(ML-101): implement GigaAM chunked audio pipeline`
 - `feat(BE-201): add action items and due dates extraction`
 - `fix(BE-102): fix margins in official ministry docx template`
 
