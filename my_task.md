@@ -1,4 +1,0 @@
-- AI / ML Engineer (Speech & Local LLM):
-- Локальный STT (Faster-Whisper / GigaAM) для аудио 1.5 ч.
-- Доменный словарь и hotwords (Минобр, подведы, ФИО).
-- Локальный инференс российской LLM (GigaChat On-Prem / Saiga / Vikhr).

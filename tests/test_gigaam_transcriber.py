@@ -37,3 +37,29 @@ def test_transcription_rejects_missing_file(tmp_path):
 def test_transcription_rejects_invalid_batch_size():
     with pytest.raises(ValueError):
         GigaAMTranscriber(model=Mock(), batch_size=0)
+
+
+def test_resolve_vad_param_precedence(monkeypatch):
+    from backend.app.services.gigaam_transcriber import _resolve_vad_param
+
+    # 1. Явный аргумент имеет наивысший приоритет
+    assert _resolve_vad_param("VAD_TEST", 1.5, 0.0) == 1.5
+
+    # 2. Переменная окружения
+    monkeypatch.setenv("VAD_TEST", "2.5")
+    assert _resolve_vad_param("VAD_TEST", None, 0.0) == 2.5
+
+    # 3. Дефолтное значение
+    monkeypatch.delenv("VAD_TEST", raising=False)
+    assert _resolve_vad_param("VAD_TEST", None, 3.5) == 3.5
+
+
+def test_gigaam_transcriber_custom_vad_params():
+    transcriber = GigaAMTranscriber(
+        model=Mock(),
+        batch_size=2,
+        min_duration_on=0.5,
+        min_duration_off=0.8,
+    )
+    assert transcriber._min_duration_on == 0.5
+    assert transcriber._min_duration_off == 0.8

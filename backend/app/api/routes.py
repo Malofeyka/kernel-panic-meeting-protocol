@@ -4,7 +4,7 @@
 """
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
@@ -42,7 +42,7 @@ async def create_session(
     request: SessionCreateRequest | None = None,
 ) -> SessionCreateResponse:
     session_id = str(uuid.uuid4())
-    now_str = datetime.now().strftime("%d.%m.%Y")
+    now_str = datetime.now(UTC).strftime("%d.%m.%Y")
     title = request.meeting_title if request and request.meeting_title else "Аппаратное совещание"
     date_str = request.meeting_date if request and request.meeting_date else now_str
 

@@ -18,7 +18,9 @@ def _resolve_vad_param(env_name: str, value: float | None, default: float) -> fl
     if value is not None:
         return value
     raw = os.getenv(env_name)
-    return float(raw) if raw not in (None, "") else default
+    if raw:
+        return float(raw)
+    return default
 
 
 class GigaAMTranscriber:
@@ -83,14 +85,28 @@ class GigaAMTranscriber:
         if _DLL_DIRECTORY_HANDLE is not None:
             return
 
-        ffmpeg_bin = Path(os.getenv("FFMPEG_BIN", r"C:\ffmpeg8\bin")).resolve()
-        if not (ffmpeg_bin / "ffmpeg.exe").is_file():
-            raise RuntimeError(
-                f"FFmpeg не найден в '{ffmpeg_bin}'. Укажите каталог bin в FFMPEG_BIN."
-            )
+        import shutil
 
-        _DLL_DIRECTORY_HANDLE = os.add_dll_directory(str(ffmpeg_bin))
-        os.environ["PATH"] = f"{ffmpeg_bin}{os.pathsep}{os.environ.get('PATH', '')}"
+        add_dll = getattr(os, "add_dll_directory", None)
+        custom_bin = os.getenv("FFMPEG_BIN")
+        if custom_bin:
+            ffmpeg_bin = Path(custom_bin).resolve()
+            if (ffmpeg_bin / "ffmpeg.exe").is_file():
+                if add_dll is not None:
+                    _DLL_DIRECTORY_HANDLE = add_dll(str(ffmpeg_bin))
+                os.environ["PATH"] = f"{ffmpeg_bin}{os.pathsep}{os.environ.get('PATH', '')}"
+                return
+
+        if shutil.which("ffmpeg") is not None:
+            return
+
+        for candidate in [r"C:\ffmpeg\bin", r"C:\ffmpeg8\bin"]:
+            candidate_path = Path(candidate).resolve()
+            if (candidate_path / "ffmpeg.exe").is_file():
+                if add_dll is not None:
+                    _DLL_DIRECTORY_HANDLE = add_dll(str(candidate_path))
+                os.environ["PATH"] = f"{candidate_path}{os.pathsep}{os.environ.get('PATH', '')}"
+                return
 
     def transcribe(self, audio_path: str | Path) -> MeetingTranscription:
         source_path = Path(audio_path)
