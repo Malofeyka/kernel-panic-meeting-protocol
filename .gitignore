@@ -55,6 +55,7 @@ hf_cache/
 !templates/*.docx
 *.transcription.json
 *.summary.json
+/*.json
 
 # Local experiment outputs
 benchmarks/results/
@@ -64,6 +65,9 @@ reports/local/
 *.pid
 *.tmp
 *.bak
+
+# Workspace-specific lockfile; the canonical lockfile is at repository root
+backend/uv.lock
 
 # Frontend
 node_modules/

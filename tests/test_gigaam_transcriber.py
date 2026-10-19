@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from backend.app.schemas.transcription import DomainVocabulary
 from backend.app.services.gigaam_transcriber import GigaAMTranscriber
 
 
@@ -24,6 +25,46 @@ def test_transcription_contains_llm_text_and_timestamps(tmp_path):
         {"start": 0.0, "end": 1.25, "text": "Первый фрагмент."},
         {"start": 1.25, "end": 2.5, "text": "Второй фрагмент."},
     ]
+    model.transcribe_longform.assert_called_once_with(str(audio_path), fr_batch_size=2)
+
+
+def test_transcription_with_empty_vocabulary_preserves_result(tmp_path):
+    audio_path = tmp_path / "meeting.wav"
+    audio_path.write_bytes(b"test")
+    model = Mock()
+    model.transcribe_longform.return_value = [
+        SimpleNamespace(start=0.0, end=1.25, text="Егэ остаётся как распознано."),
+    ]
+    transcriber = GigaAMTranscriber(model=model, batch_size=2)
+
+    result = transcriber.transcribe(audio_path, vocabulary=DomainVocabulary())
+
+    assert result.text == "Егэ остаётся как распознано."
+    assert result.model_dump()["segments"] == [
+        {"start": 0.0, "end": 1.25, "text": "Егэ остаётся как распознано."}
+    ]
+    model.transcribe_longform.assert_called_once_with(str(audio_path), fr_batch_size=2)
+
+
+def test_transcription_with_vocabulary_uses_fallback_and_preserves_timestamps(tmp_path):
+    audio_path = tmp_path / "meeting.wav"
+    audio_path.write_bytes(b"test")
+    raw_segments = [
+        SimpleNamespace(start=0.0, end=1.25, text="Егэ."),
+        SimpleNamespace(start=1.25, end=2.5, text="Второй фрагмент."),
+    ]
+    model = Mock()
+    model.transcribe_longform.return_value = raw_segments
+    transcriber = GigaAMTranscriber(model=model, batch_size=2)
+
+    result = transcriber.transcribe(audio_path, vocabulary=DomainVocabulary(abbreviations=["ЕГЭ"]))
+
+    assert result.text == "ЕГЭ. Второй фрагмент."
+    assert result.model_dump()["segments"] == [
+        {"start": 0.0, "end": 1.25, "text": "ЕГЭ."},
+        {"start": 1.25, "end": 2.5, "text": "Второй фрагмент."},
+    ]
+    assert raw_segments[0].text == "Егэ."
     model.transcribe_longform.assert_called_once_with(str(audio_path), fr_batch_size=2)
 
 

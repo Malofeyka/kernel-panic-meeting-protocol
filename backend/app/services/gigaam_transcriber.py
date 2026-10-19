@@ -3,7 +3,12 @@ import os
 from pathlib import Path
 from typing import Any
 
-from backend.app.schemas.transcription import MeetingTranscription, TranscriptionSegment
+from backend.app.schemas.transcription import (
+    DomainVocabulary,
+    MeetingTranscription,
+    TranscriptionSegment,
+)
+from backend.app.services.domain_vocabulary import DomainTextNormalizer
 
 _DLL_DIRECTORY_HANDLE: Any | None = None
 
@@ -108,19 +113,35 @@ class GigaAMTranscriber:
                 os.environ["PATH"] = f"{candidate_path}{os.pathsep}{os.environ.get('PATH', '')}"
                 return
 
-    def transcribe(self, audio_path: str | Path) -> MeetingTranscription:
+    def transcribe(
+        self,
+        audio_path: str | Path,
+        vocabulary: DomainVocabulary | None = None,
+    ) -> MeetingTranscription:
+        """Транскрибирует локально и применяет словарь в fallback-режиме.
+
+        GigaAM 0.2.0 не принимает prompt/hotwords: дополнительные kwargs
+        transcribe_longform предназначены для VAD, поэтому контекст в модель не передаётся.
+        """
         source_path = Path(audio_path)
         if not source_path.is_file():
             raise FileNotFoundError(f"Аудиофайл не найден: {source_path}")
 
         segments = self._model.transcribe_longform(str(source_path), fr_batch_size=self._batch_size)
-        result_segments = [
+        raw_segments = [
             TranscriptionSegment(
                 start=float(segment.start),
                 end=float(segment.end),
                 text=segment.text,
             )
             for segment in segments
+        ]
+        normalizer = DomainTextNormalizer(vocabulary) if vocabulary is not None else None
+        result_segments = [
+            segment.model_copy(update={"text": normalizer.normalize(segment.text)})
+            if normalizer is not None
+            else segment
+            for segment in raw_segments
         ]
         full_text = " ".join(segment.text.strip() for segment in result_segments).strip()
         return MeetingTranscription(

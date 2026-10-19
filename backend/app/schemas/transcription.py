@@ -1,4 +1,28 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+
+class DomainVocabulary(BaseModel):
+    people: list[str] = Field(default_factory=list, description="ФИО участников совещания")
+    positions: list[str] = Field(default_factory=list, description="Должности участников")
+    organizations: list[str] = Field(default_factory=list, description="Организации и учреждения")
+    abbreviations: list[str] = Field(
+        default_factory=list, description="Аббревиатуры предметной области"
+    )
+    terms: list[str] = Field(default_factory=list, description="Термины и фразы повестки")
+
+    @field_validator("people", "positions", "organizations", "abbreviations", "terms")
+    @classmethod
+    def normalize_entries(cls, value: list[str]) -> list[str]:
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for entry in value:
+            cleaned = " ".join(entry.split())
+            key = cleaned.casefold()
+            if not cleaned or key in seen:
+                continue
+            normalized.append(cleaned)
+            seen.add(key)
+        return normalized
 
 
 class TranscriptionSegment(BaseModel):

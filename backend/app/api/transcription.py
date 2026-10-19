@@ -12,9 +12,10 @@ import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
+from pydantic import ValidationError
 
-from backend.app.schemas.transcription import MeetingTranscription
+from backend.app.schemas.transcription import DomainVocabulary, MeetingTranscription
 from backend.app.services.gigaam_transcriber import GigaAMTranscriber
 
 router = APIRouter(prefix="/api/transcription", tags=["Транскрибация (STT)"])
@@ -40,6 +41,18 @@ def _get_transcriber() -> GigaAMTranscriber:
     return _transcriber
 
 
+def _parse_vocabulary(raw_vocabulary: str | None) -> DomainVocabulary | None:
+    if raw_vocabulary is None or not raw_vocabulary.strip():
+        return None
+    try:
+        return DomainVocabulary.model_validate_json(raw_vocabulary)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Доменный словарь должен быть JSON-объектом с поддерживаемыми полями",
+        ) from exc
+
+
 @router.post(
     "",
     response_model=MeetingTranscription,
@@ -49,7 +62,11 @@ def transcribe_audio(
     audio_file: UploadFile = File(
         ..., description="Аудио- или видеофайл совещания (WAV, MP3, M4A, MP4...)"
     ),
+    vocabulary: str | None = Form(
+        default=None, description="Необязательный JSON-объект доменного словаря"
+    ),
 ) -> MeetingTranscription:
+    domain_vocabulary = _parse_vocabulary(vocabulary)
     suffix = Path(audio_file.filename or "audio.mp4").suffix or ".mp4"
     tmp_path: Path | None = None
     try:
@@ -57,7 +74,9 @@ def transcribe_audio(
             tmp.write(audio_file.file.read())
             tmp_path = Path(tmp.name)
 
-        return _get_transcriber().transcribe(tmp_path)
+        if domain_vocabulary is None:
+            return _get_transcriber().transcribe(tmp_path)
+        return _get_transcriber().transcribe(tmp_path, vocabulary=domain_vocabulary)
     except HTTPException:
         raise
     except Exception as exc:  # ошибки модели возвращаем бэкенду читаемым JSON
