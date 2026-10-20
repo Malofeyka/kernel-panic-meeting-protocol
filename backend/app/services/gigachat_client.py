@@ -1,4 +1,5 @@
 import os
+from typing import Any
 from urllib.parse import urlsplit
 
 import httpx
@@ -64,21 +65,26 @@ class GigaChatClient:
         system_prompt: str | None = None,
         temperature: float = 0.0,
         max_tokens: int = 512,
+        json_schema: dict[str, Any] | None = None,
     ) -> str:
+        """Запрос к llama.cpp; `json_schema` включает грамматику строгого JSON-ответа."""
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
         try:
-            response = self._client.post(
-                "/v1/chat/completions",
-                json={
-                    "messages": messages,
-                    "temperature": temperature,
-                    "max_tokens": max_tokens,
-                    "stream": False,
-                },
-            )
+            payload: dict[str, Any] = {
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "stream": False,
+            }
+            if json_schema is not None:
+                payload["response_format"] = {
+                    "type": "json_schema",
+                    "json_schema": {"name": "response", "schema": json_schema},
+                }
+            response = self._client.post("/v1/chat/completions", json=payload)
         except httpx.RequestError as exc:
             raise GigaChatUnavailableError(
                 f"Не удалось обратиться к локальному серверу GigaChat: {exc}"
