@@ -119,7 +119,7 @@ flowchart TD
   "session_id": "uuid-v4",
   "metadata": {
     "meeting_title": "Аппаратное совещание Министерства образования",
-    "meeting_date": "2026-10-20",
+    "meeting_date": "20.10.2026",
     "chairperson": "Министр образования Свердловской области",
     "secretary": "Специалист секретариата",
     "attendees": ["Иванов И.И.", "Петров П.П.", "Сидорова С.С."]
@@ -136,7 +136,7 @@ flowchart TD
           "task": "Обеспечить проверку готовности пунктов проведения экзаменов",
           "assignee": "Петров П.П.",
           "assignee_role": "Начальник отдела контроля качества образования",
-          "due_date": "2026-11-15",
+          "due_date": "15.11.2026",
           "status": "valid",
           "quote": "Петрову обеспечить проверку готовности ППЭ до 15 ноября"
         }
@@ -155,7 +155,7 @@ flowchart TD
     "risks": []
   },
   "revision_cycle": {
-    "current_cycle": 1,
+    "current_cycle": 0,
     "max_cycles": 2,
     "is_escalated_to_manual": false
   }
