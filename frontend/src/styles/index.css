@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+
+/*
+ * Палитра в духе государственных сервисов: белые листы на светло-сером фоне,
+ * тёмно-синий текст, один синий акцент. Шрифт Golos — шрифт Госуслуг,
+ * встроен в сборку (в закрытом контуре нет доступа к CDN).
+ */
+@theme {
+  --font-sans: 'Golos Text Variable', 'Segoe UI', Roboto, Arial, sans-serif;
+
+  --color-page: #f3f5f8;
+  --color-surface: #ffffff;
+  --color-subtle: #f7f9fb;
+  --color-line: #e2e7ee;
+  --color-line-strong: #c8d0da;
+
+  --color-ink: #0b1f33;
+  --color-ink-2: #44546a;
+  --color-ink-3: #66727f;
+
+  --color-primary: #0d4cd3;
+  --color-primary-hover: #0a3eb0;
+  --color-primary-soft: #edf2fd;
+
+  --color-success: #12803e;
+  --color-success-soft: #e8f5ec;
+  --color-warning: #9a5b00;
+  --color-warning-soft: #fff5e0;
+  --color-danger: #c92a2a;
+  --color-danger-soft: #fdeeee;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+}
+
+@layer base {
+  html {
+    background: var(--color-page);
+    color-scheme: light;
+  }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-primary-soft);
+  }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.55;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
