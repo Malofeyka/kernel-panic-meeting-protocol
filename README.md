@@ -37,13 +37,13 @@
 
 ## 👥 Состав команды и распределение ролей (5 человек)
 
-| Роль | Зона ответственности | Ключевые задачи |
-|---|---|---|
-| **1. Team Lead / Архитектор системы** | Системная архитектура, OpenSpec, изоляция защищенного контура, координация команды и приёмка | [TL-101 .. TL-401](openspec/changes/001-initial-protocol-agent/tasks.md) |
-| **2. AI / ML Engineer (Speech & LLM)** | Офлайн STT (аудио 1.5 ч), доменный словарь Минобразования, квантизация и инференс локальной российской LLM | [ML-101 .. ML-302](openspec/changes/001-initial-protocol-agent/tasks.md) |
-| **3. Backend Engineer (NER, RAG, DOCX)** | Бизнес-логика на FastAPI, парсинг материалов, извлечение связок «Кто/Что/Срок», аналитика рисков, сборка DOCX | [BE-101 .. BE-301](openspec/changes/001-initial-protocol-agent/tasks.md) |
-| **4. Frontend / Fullstack Developer** | Клиентский интерфейс React/Vite: загрузка файлов, интерактивный редактор проекта протокола, счетчик правок (до 2) | [FE-101 .. FE-301](openspec/changes/001-initial-protocol-agent/tasks.md) |
-| **5. QA Engineer / AI Evaluator & TechWriter** | Оценка метрик качества LLM (Recall поручений, отсутствие галлюцинаций), разметка датасетов, инструкция пользователя | [QA-101 .. QA-401](openspec/changes/001-initial-protocol-agent/tasks.md) |
+| Роль | ФИО исполнителя | Зона ответственности | Ключевые задачи |
+|---|---|---|---|
+| **1. Team Lead / Архитектор системы** | **Попов Владимир Александрович** | Системная архитектура, OpenSpec, изоляция защищенного контура, координация команды и приёмка | [TL-101 .. TL-401, AN-102](openspec/changes/001-initial-protocol-agent/tasks.md) |
+| **2. AI / ML Engineer (Speech & LLM)** | **Юнусов Тимур Наилевич** | Офлайн STT (аудио 1.5 ч), доменный словарь Минобразования, квантизация и инференс локальной российской LLM | [ML-101 .. ML-302, AN-103](openspec/changes/001-initial-protocol-agent/tasks.md) |
+| **3. Backend Engineer (NER, RAG, DOCX)** | **Кизильбаев Тамерлан Муратович** | Бизнес-логика на FastAPI, парсинг материалов, извлечение связок «Кто/Что/Срок», аналитика рисков, сборка DOCX | [BE-101 .. BE-301, AN-101](openspec/changes/001-initial-protocol-agent/tasks.md) |
+| **4. Frontend / Fullstack Developer** | **Плетнев Анатолий Алексеевич** | Клиентский интерфейс React/Vite: загрузка файлов, интерактивный редактор проекта протокола, счетчик правок (до 2) | [FE-101 .. FE-301, AN-104](openspec/changes/001-initial-protocol-agent/tasks.md) |
+| **5. QA Engineer / AI Evaluator & TechWriter** | **Мельников Сергей Алексеевич** | Оценка метрик качества LLM (Recall поручений, отсутствие галлюцинаций), разметка датасетов, инструкция пользователя | [QA-101 .. QA-401, QA-103](openspec/changes/001-initial-protocol-agent/tasks.md) |
 
 ---
 
