@@ -226,6 +226,7 @@ class ProtocolMetadata(BaseModel):
 class ProtocolDraft(BaseModel):
     session_id: str = Field(..., description="Идентификатор рабочей сессии")
     metadata: ProtocolMetadata
+    summary: str | None = Field(None, description="Краткое содержание совещания по стенограмме")
     agenda_items: list[AgendaItem] = Field(default_factory=list)
     analytics: AnalyticsReport = Field(default_factory=AnalyticsReport)
     revision_cycle: RevisionCycleState = Field(default_factory=RevisionCycleState)

@@ -350,6 +350,39 @@ def test_llm_unavailable_then_retry(fake_llm: FakeLLM, fake_transcriber: FakeTra
     assert len(fake_transcriber.calls) == 1  # STT не повторялся: стенограмма из кэша
 
 
+def test_empty_extraction_summary_is_in_exported_docx(fake_llm: FakeLLM) -> None:
+    fake_llm._extraction = lambda _: json.dumps(
+        {"decisions": [], "action_items": [], "reports": []}
+    )
+    session_id = _create()
+    upload = client.post(
+        f"/api/sessions/{session_id}/upload",
+        files={"audio_file": ("meeting.mp3", b"fake audio", "audio/mpeg")},
+    )
+    assert upload.status_code == 200
+
+    status_body = client.get(f"/api/sessions/{session_id}/status").json()
+    assert status_body["status"] == ProcessingStep.READY
+    assert client.get(f"/api/sessions/{session_id}").json()["has_draft"] is True
+    draft = client.get(f"/api/sessions/{session_id}/draft").json()
+    assert draft["summary"] == fake_llm.summary
+
+    export = client.post(f"/api/sessions/{session_id}/export")
+    assert export.status_code == 200
+    content = client.get(export.json()["download_url"]).content
+    paragraphs = "\n".join(p.text for p in Document(io.BytesIO(content)).paragraphs)
+    assert "КРАТКОЕ СОДЕРЖАНИЕ СОВЕЩАНИЯ" in paragraphs
+    assert fake_llm.summary in paragraphs
+
+
+def test_empty_draft_cannot_be_exported(services: AppServices) -> None:
+    session_id = _create()
+    record = services.store.get(session_id)
+    record.draft.summary = None
+    services.store.save(record)
+    assert client.post(f"/api/sessions/{session_id}/export").status_code == 409
+
+
 def test_ai_refine_failure_refunds_cycle(fake_llm: FakeLLM) -> None:
     session_id = _create()
     _upload_full_set(session_id)
@@ -420,8 +453,9 @@ def test_export_with_custom_template(template_kind: str) -> None:
     export = client.post(f"/api/sessions/{session_id}/export").json()
     content = client.get(export["download_url"]).content
     text = "\n".join(p.text for p in Document(io.BytesIO(content)).paragraphs)
+    assert "На совещании рассмотрены рабочие вопросы" in text
     if template_kind == "tagged":
-        assert export["warnings"] == []
+        assert export["warnings"] and "summary" in export["warnings"][0]
         assert f"Протокол {MEETING_DATE} № 7" in text
     else:
         assert export["warnings"] and "не содержит полей" in export["warnings"][0]
