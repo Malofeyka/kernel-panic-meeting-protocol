@@ -7,6 +7,7 @@
   не ломает экспорт: используется шаблон по умолчанию, а пользователь получает предупреждение.
 """
 
+import re
 import zipfile
 from io import BytesIO
 from pathlib import Path
@@ -118,6 +119,7 @@ def build_context(draft: ProtocolDraft, settings: Settings) -> dict[str, Any]:
         "protocol_number": meta.protocol_number or "____",
         "chairperson": meta.chairperson or PLACEHOLDER,
         "secretary": meta.secretary or PLACEHOLDER,
+        "summary": draft.summary or "",
         "attendees": attendees,
         "attendees_text": ", ".join(a["name"] for a in attendees),
         "agenda": agenda,
@@ -184,6 +186,18 @@ def build_default_template(settings: Settings) -> bytes:
     _paragraph(document, "{{ a.name }}{% if a.position %} — {{ a.position }}{% endif %}")
     _paragraph(document, "{%p endfor %}")
 
+    _paragraph(document, "{%p if summary %}")
+    _paragraph(
+        document,
+        "КРАТКОЕ СОДЕРЖАНИЕ СОВЕЩАНИЯ",
+        bold=True,
+        align=center,
+        space_before=12,
+    )
+    _paragraph(document, "{{ summary }}", align=justify, first_line_indent=True)
+    _paragraph(document, "{%p endif %}")
+
+    _paragraph(document, "{%p if agenda %}")
     _paragraph(document, "ПОВЕСТКА ДНЯ:", bold=True, align=center, space_before=12)
     _paragraph(document, "{%p for item in agenda %}")
     _paragraph(
@@ -208,7 +222,9 @@ def build_default_template(settings: Settings) -> bytes:
     )
     _paragraph(document, "{%p endfor %}")
     _paragraph(document, "{%p endfor %}")
+    _paragraph(document, "{%p endif %}")
 
+    _paragraph(document, "{%p if actions %}")
     _paragraph(document, "ПЕРЕЧЕНЬ ПОРУЧЕНИЙ", bold=True, align=center, space_before=12)
     table = document.add_table(rows=4, cols=4)
     table.style = "Table Grid"
@@ -225,6 +241,7 @@ def build_default_template(settings: Settings) -> bytes:
         for cell, text, width in zip(row.cells, texts, widths, strict=True):
             cell.width = width
             cell.paragraphs[0].add_run(text).bold = bold
+    _paragraph(document, "{%p endif %}")
 
     signature = _paragraph(document, "Председатель\t{{ chairperson }}", space_before=24)
     signature.paragraph_format.tab_stops.add_tab_stop(Cm(_TEXT_WIDTH_CM), WD_TAB_ALIGNMENT.RIGHT)
@@ -243,6 +260,15 @@ def template_has_placeholders(path: Path) -> bool:
     except (zipfile.BadZipFile, KeyError, OSError):
         return False
     return "{{" in xml or "{%" in xml
+
+
+def template_has_summary_placeholder(path: Path) -> bool:
+    try:
+        with zipfile.ZipFile(path) as archive:
+            xml = archive.read("word/document.xml").decode("utf-8", errors="ignore")
+    except (zipfile.BadZipFile, KeyError, OSError):
+        return False
+    return re.search(r"\{\{\s*summary\s*\}\}", xml) is not None
 
 
 def _render(template_source: Path | BytesIO, context: dict[str, Any], output_path: Path) -> None:
@@ -266,6 +292,26 @@ class DocxGenerator:
             if template_has_placeholders(custom_template):
                 try:
                     _render(custom_template, context, output_path)
+                    if context["summary"] and not template_has_summary_placeholder(custom_template):
+                        document = Document(str(output_path))
+                        _paragraph(
+                            document,
+                            "КРАТКОЕ СОДЕРЖАНИЕ СОВЕЩАНИЯ",
+                            bold=True,
+                            align=WD_ALIGN_PARAGRAPH.CENTER,
+                            space_before=12,
+                        )
+                        _paragraph(
+                            document,
+                            context["summary"],
+                            align=WD_ALIGN_PARAGRAPH.JUSTIFY,
+                            first_line_indent=True,
+                        )
+                        document.save(str(output_path))
+                        warnings.append(
+                            "В пользовательском шаблоне отсутствует поле {{ summary }} — "
+                            "краткое содержание добавлено в конец документа."
+                        )
                     return warnings
                 except Exception as exc:  # noqa: BLE001 — любой сбой шаблона -> бланк по умолчанию
                     warnings.append(

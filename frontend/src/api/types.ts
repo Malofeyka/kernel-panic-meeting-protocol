@@ -122,6 +122,7 @@ export interface ProtocolMetadata {
 export interface ProtocolDraft {
   session_id: string
   metadata: ProtocolMetadata
+  summary?: string | null
   agenda_items: AgendaItem[]
   analytics: AnalyticsReport
   revision_cycle: RevisionCycleState

@@ -535,6 +535,14 @@ def refine_draft(
 def export_protocol_docx(session_id: str, services: ServicesDep) -> ExportDocxResponse:
     record = _get_record(services, session_id)
     _ensure_not_busy(record)
+    if not record.draft.agenda_items and not (record.draft.summary or "").strip():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Проект протокола не содержит ни одного пункта или краткого содержания "
+                "и не может быть экспортирован."
+            ),
+        )
     template = (
         services.store.files_dir(session_id) / record.files.template.stored_name
         if record.files.template

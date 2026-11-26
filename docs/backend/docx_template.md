@@ -20,6 +20,7 @@
 | `{{ meeting_date_long }}` | 20 октября 2026 г. |
 | `{{ protocol_number }}` | 12 (или `____`) |
 | `{{ chairperson }}`, `{{ secretary }}` | Иванов И.И. (или `[уточнить]`) |
+| `{{ summary }}` | Краткое содержание совещания, сформированное моделью по стенограмме |
 | `{{ attendees_text }}` | Иванов И.И., Петров П.П. |
 | `attendees[]` | `a.name`, `a.full_name`, `a.position` |
 | `agenda[]` | `item.number`, `item.topic`, `item.reporter`, `item.points[]` |

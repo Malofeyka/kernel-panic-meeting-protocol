@@ -23,6 +23,8 @@ class Transcriber(Protocol):
 class LLMClient(Protocol):
     def health(self) -> None: ...
 
+    def summarize(self, transcription: MeetingTranscription) -> str: ...
+
     def chat(
         self,
         prompt: str,

@@ -176,15 +176,23 @@ class FakeLLM:
         extraction: Callable[[str], str] | None = None,
         refine: Callable[[str], str] | None = None,
         available: bool = True,
+        summary: str = "На совещании рассмотрены рабочие вопросы и текущие задачи.",
     ) -> None:
         self.calls: list[dict[str, Any]] = []
         self.available = available
+        self.summary = summary
         self._extraction = extraction or (lambda _: json.dumps(EXTRACTION_RESPONSE))
         self._refine = refine or (lambda prompt: json.dumps(default_refine_response(prompt)))
 
     def health(self) -> None:
         if not self.available:
             raise GigaChatUnavailableError("Локальный сервер GigaChat недоступен: refused")
+
+    def summarize(self, transcription: MeetingTranscription) -> str:
+        del transcription
+        if not self.available:
+            raise GigaChatUnavailableError("Локальный сервер GigaChat недоступен: refused")
+        return self.summary
 
     def chat(
         self,

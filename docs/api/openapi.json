@@ -848,6 +848,18 @@
             "description": "Идентификатор рабочей сессии",
             "title": "Session Id",
             "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Краткое содержание совещания по стенограмме",
+            "title": "Summary"
           }
         },
         "required": [

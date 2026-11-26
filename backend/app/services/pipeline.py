@@ -215,6 +215,9 @@ class ProcessingPipeline:
         extraction = ProtocolExtractor(llm, self._settings).extract(
             transcription, context, record.draft.metadata.meeting_date, on_progress=progress
         )
+        summary = llm.summarize(transcription).strip()
+        if not summary:
+            raise PipelineError("GigaChat вернул пустое краткое содержание совещания.")
 
         self._status(
             session_id, ProcessingStep.CROSS_CHECKING, 90, "Сверка с участниками и архивом…"
@@ -240,6 +243,7 @@ class ProcessingPipeline:
         draft = ProtocolDraft(
             session_id=session_id,
             metadata=metadata,
+            summary=summary,
             agenda_items=built.agenda_items,
             revision_cycle=RevisionCycleState(max_cycles=self._settings.max_revision_cycles),
         )

@@ -98,7 +98,14 @@ export function ProtocolEditor({ draft, dispatch, onQuote }: Props) {
         </dd>
       </dl>
 
-      {draft.agenda_items.length === 0 && (
+      {draft.summary && (
+        <section className="mt-8 rounded-xl border border-line bg-surface-2 p-4">
+          <h2 className="font-semibold">Краткое содержание совещания</h2>
+          <p className="mt-2 whitespace-pre-wrap text-ink-2">{draft.summary}</p>
+        </section>
+      )}
+
+      {draft.agenda_items.length === 0 && !draft.summary && (
         <p className="mt-8 text-ink-3">
           В записи не найдено принятых решений и поручений. Добавьте вопрос вручную.
         </p>
